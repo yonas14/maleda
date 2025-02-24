@@ -1,0 +1,82 @@
+[
+  {
+    "title": "You’re Using ChatGPT Wrong! Here’s How to Be Ahead of 99% of Users",
+    "description": "Master ChatGPT by learning prompt engineering.",
+    "date": "Mar 17, 2023",
+    "views": "38K",
+    "comments": "793",
+    "image": "/robot.png"
+  },
+  {
+    "title": "DIY AI & ML: Logistic Regression",
+    "description": "An exercise in gaining an in-depth understanding of logistic regression.",
+    "date": "1d ago",
+    "views": "10",
+    "comments": "1",
+    "image": "/ai-ml.png"
+  },
+  {
+    "title": "The Future of AI: Predictions for 2030",
+    "description": "Exploring how artificial intelligence will shape our world by 2030.",
+    "date": "Feb 10, 2024",
+    "views": "25K",
+    "comments": "102",
+    "image": "/ai-future.png"
+  },
+  {
+    "title": "How to Build Scalable Web Apps with Next.js",
+    "description": "A guide to building high-performance web applications using Next.js.",
+    "date": "Jan 28, 2024",
+    "views": "18K",
+    "comments": "56",
+    "image": "/nextjs-scalability.png"
+  },
+  {
+    "title": "The Rise of Decentralized Social Media",
+    "description": "Why decentralized platforms might replace traditional social networks.",
+    "date": "Dec 20, 2023",
+    "views": "12K",
+    "comments": "89",
+    "image": "/decentralized-social.png"
+  },
+  {
+    "title": "Understanding Web3 and Its Impact on the Internet",
+    "description": "A beginner-friendly introduction to Web3 and how it's changing the web.",
+    "date": "Nov 15, 2023",
+    "views": "15K",
+    "comments": "120",
+    "image": "/web3-impact.png"
+  },
+  {
+    "title": "The Psychology of Habit Formation",
+    "description": "How to build good habits and break bad ones using psychology.",
+    "date": "Oct 5, 2023",
+    "views": "40K",
+    "comments": "150",
+    "image": "/habit-formation.png"
+  },
+  {
+    "title": "Quantum Computing: What You Need to Know",
+    "description": "A deep dive into quantum computing and its potential.",
+    "date": "Sep 30, 2023",
+    "views": "22K",
+    "comments": "98",
+    "image": "/quantum-computing.png"
+  },
+  {
+    "title": "The Secret to Writing Engaging Blog Posts",
+    "description": "Tips and strategies for creating compelling content that attracts readers.",
+    "date": "Aug 22, 2023",
+    "views": "30K",
+    "comments": "210",
+    "image": "/writing-tips.png"
+  },
+  {
+    "title": "Cybersecurity in 2024: Trends and Best Practices",
+    "description": "How to stay safe online and protect your data in an evolving digital world.",
+    "date": "Jul 10, 2023",
+    "views": "19K",
+    "comments": "132",
+    "image": "/cybersecurity.png"
+  }
+]
