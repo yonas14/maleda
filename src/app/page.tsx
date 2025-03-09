@@ -44,8 +44,8 @@ export default async function Home() {
               <TabsList className="flex space-x-4 bg-white shadow-md p-2 rounded-md sticky top-0 z-10">
                 <TabsTrigger value="all">All</TabsTrigger>
                 {categories.map((category) => (
-                  <TabsTrigger key={category!} value={category!.toLowerCase()}>
-                    {category!}
+                  <TabsTrigger key={category} value={category.toLowerCase()}>
+                    {category}
                   </TabsTrigger>
                 ))}
               </TabsList>
@@ -63,7 +63,7 @@ export default async function Home() {
 
               {/* Dynamic Category Tabs */}
               {categories.map((category) => (
-                <TabsContent key={category!} value={category!.toLowerCase()} className="space-y-6">
+                <TabsContent key={category} value={category.toLowerCase()} className="space-y-6">
                   {articles
                     .filter((article) => (article.catagory || article.category || 'Uncategorized') === category)
                     .map((article, index) => (
