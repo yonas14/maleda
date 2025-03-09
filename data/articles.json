@@ -2,6 +2,7 @@
   {
     "title": "You're Using ChatGPT Wrong! Here's How to Be Ahead of 99% of Users",
     "description": "Master ChatGPT by learning prompt engineering.",
+    "content": "Artificial Intelligence has revolutionized the way we interact with technology, and ChatGPT stands at the forefront of this revolution. However, many users barely scratch the surface of its capabilities. Here's how to maximize your ChatGPT experience:\n\n1. Use System Prompts\nStart your conversations by setting a context or role for ChatGPT. For example: 'You are an expert programmer with 20 years of experience in Python.'\n\n2. Be Specific and Detailed\nInstead of asking 'How do I write better code?', try 'Review this Python function for performance improvements, security vulnerabilities, and adherence to PEP 8 standards.'\n\n3. Chain Your Prompts\nBuild on previous responses by referencing them in your follow-up questions. This maintains context and leads to more coherent interactions.\n\n4. Leverage Different Personas\nAsk ChatGPT to approach problems from different perspectives by assigning it various expert roles.\n\n5. Use Temperature Settings\nUnderstand how temperature affects responses - lower for factual, higher for creative tasks.\n\nBy implementing these strategies, you'll unlock ChatGPT's full potential and stay ahead of the curve in AI interaction.",
     "date": "Mar 17, 2023",
     "views": "38K",
     "comments": "793",
@@ -13,9 +14,10 @@
   {
     "title": "DIY AI & ML: Logistic Regression",
     "description": "An exercise in gaining an in-depth understanding of logistic regression.",
-    "date": "1d ago",
-    "views": "10",
-    "comments": "1",
+    "content": "Logistic regression is a fundamental building block in machine learning, yet many practitioners treat it as a black box. Let's break it down and implement it from scratch.\n\nWhat is Logistic Regression?\nAt its core, logistic regression is a statistical model that uses a logistic function to model a binary dependent variable. Despite its name, it's used for classification rather than regression.\n\nImplementation from Scratch:\n```python\nimport numpy as np\n\nclass LogisticRegression:\n    def __init__(self, learning_rate=0.01, iterations=1000):\n        self.lr = learning_rate\n        self.iterations = iterations\n        self.weights = None\n        self.bias = None\n\n    def sigmoid(self, z):\n        return 1 / (1 + np.exp(-z))\n\n    def fit(self, X, y):\n        n_samples, n_features = X.shape\n        self.weights = np.zeros(n_features)\n        self.bias = 0\n\n        for _ in range(self.iterations):\n            linear_pred = np.dot(X, self.weights) + self.bias\n            predictions = self.sigmoid(linear_pred)\n\n            # Gradient descent\n            dw = (1/n_samples) * np.dot(X.T, (predictions - y))\n            db = (1/n_samples) * np.sum(predictions - y)\n\n            self.weights -= self.lr * dw\n            self.bias -= self.lr * db\n```\n\nUnderstanding the Math:\n1. The sigmoid function transforms our input to a probability between 0 and 1\n2. We use gradient descent to minimize the log loss\n3. The weights represent the importance of each feature\n\nThis implementation helps understand the inner workings of logistic regression and builds a foundation for more complex ML concepts.",
+    "date": "Feb 15, 2024",
+    "views": "10K",
+    "comments": "45",
     "image": "/ai-ml.png",
     "category": "Tech",
     "author": "Alex Kumar",
@@ -24,6 +26,7 @@
   {
     "title": "The Future of AI: Predictions for 2030",
     "description": "Exploring how artificial intelligence will shape our world by 2030.",
+    "content": "As we stand at the crossroads of technological evolution, AI's trajectory toward 2030 presents both exciting opportunities and significant challenges. Here's what experts predict for the next six years:\n\n1. Autonomous Systems\nBy 2030, autonomous vehicles will likely handle 20% of urban transportation. Beyond cars, we'll see autonomous systems in manufacturing, healthcare, and home automation.\n\n2. Healthcare Revolution\nAI will revolutionize medical diagnosis, drug discovery, and personalized medicine. Predictive healthcare models will identify potential health issues before they become serious.\n\n3. Education Transformation\nPersonalized learning paths will become the norm, with AI tutors adapting to each student's learning style and pace.\n\n4. Workplace Evolution\n- 40% of current jobs will be augmented by AI\n- New roles will emerge in AI ethics, machine learning engineering, and human-AI collaboration\n- Remote work will be enhanced by AI-powered collaboration tools\n\n5. Environmental Impact\nAI will play a crucial role in:\n- Climate change modeling\n- Renewable energy optimization\n- Resource conservation\n- Smart city management\n\n6. Ethical Considerations\nAs AI becomes more prevalent, we must address:\n- Algorithmic bias\n- Privacy concerns\n- AI governance\n- Digital divide issues\n\nThe path to 2030 requires careful navigation of these opportunities and challenges to ensure AI benefits humanity as a whole.",
     "date": "Feb 10, 2024",
     "views": "25K",
     "comments": "102",
@@ -35,6 +38,7 @@
   {
     "title": "How to Build Scalable Web Apps with Next.js",
     "description": "A guide to building high-performance web applications using Next.js.",
+    "content": "Next.js has revolutionized React development by providing a powerful framework for building production-ready applications. Here's how to create scalable web apps that can handle millions of users.\n\nArchitecture Best Practices:\n\n1. File-based Routing\n```typescript\n// pages/blog/[slug].tsx\nexport default function BlogPost({ post }) {\n  return (\n    <article>\n      <h1>{post.title}</h1>\n      <div>{post.content}</div>\n    </article>\n  )\n}\n\nexport async function getStaticPaths() {\n  // Generate paths at build time\n}\n\nexport async function getStaticProps({ params }) {\n  // Fetch data at build time\n}\n```\n\n2. API Route Optimization\n- Implement API middleware for authentication\n- Use edge functions for global performance\n- Cache responses when possible\n\n3. Database Strategies\n- Implement connection pooling\n- Use proper indexing\n- Consider read replicas for scaling\n\n4. Performance Optimization\n- Implement image optimization\n- Use incremental static regeneration\n- Leverage edge caching\n\n5. State Management\n- Choose appropriate solutions (Redux, Zustand, Jotai)\n- Implement proper data fetching strategies\n- Use SWR or React Query for data fetching\n\nFollowing these practices ensures your Next.js application remains performant as it scales.",
     "date": "Jan 28, 2024",
     "views": "18K",
     "comments": "56",
@@ -101,7 +105,8 @@
   {
     "title": "Cybersecurity in 2024: Trends and Best Practices",
     "description": "How to stay safe online and protect your data in an evolving digital world.",
-    "date": "Jul 10, 2023",
+    "content": "The cybersecurity landscape is constantly evolving, and 2024 brings new challenges and solutions. Here's what you need to know to protect yourself and your organization.\n\nEmerging Threats:\n1. AI-Powered Attacks\n- Sophisticated phishing attempts\n- Automated vulnerability scanning\n- Deep fake social engineering\n\n2. Zero-Day Exploits\n- Increased frequency of discoveries\n- Faster exploitation timelines\n- More sophisticated attack vectors\n\nBest Practices for 2024:\n\n1. Zero Trust Architecture\n```typescript\n// Example of implementing zero trust in an API route\nexport async function handler(req, res) {\n  // Verify token on every request\n  const token = req.headers.authorization\n  if (!await verifyToken(token)) {\n    return res.status(401).json({ error: 'Unauthorized' })\n  }\n\n  // Verify resource access\n  if (!await canAccessResource(token, req.query.resourceId)) {\n    return res.status(403).json({ error: 'Forbidden' })\n  }\n\n  // Process request\n}\n```\n\n2. Multi-Factor Authentication\n- Implement FIDO2 standards\n- Use biometric authentication\n- Require hardware security keys\n\n3. Data Encryption\n- Use end-to-end encryption\n- Implement at-rest encryption\n- Regular key rotation\n\n4. Security Monitoring\n- Implement SIEM solutions\n- Use AI-powered threat detection\n- Regular security audits\n\nStay vigilant and keep your security measures updated to protect against evolving threats.",
+    "date": "Jan 15, 2024",
     "views": "19K",
     "comments": "132",
     "image": "/cybersecurity.png",

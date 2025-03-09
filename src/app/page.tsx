@@ -13,8 +13,10 @@ type Article = {
   views: string;
   comments: string;
   image: string;
-  category?: string;
-  catagory?: string;
+  category: string;
+  content: string;
+  author: string;
+  readTime: string;
 };
 
 // Function to fetch articles from JSON file
@@ -28,7 +30,7 @@ export default async function Home() {
   const articles = await getArticles();
   
   // Get unique categories from articles, handling the typo in the property name
-  const categories = Array.from(new Set(articles.map(article => article.catagory || article.category)));
+  const categories = Array.from(new Set(articles.map(article => article.category)));
   
   return (
     <div className="bg-gray min-h-screen">
@@ -44,7 +46,7 @@ export default async function Home() {
               <TabsList className="flex space-x-4 bg-white shadow-md p-2 rounded-md sticky top-0 z-10">
                 <TabsTrigger value="all">All</TabsTrigger>
                 {categories.map((category) => (
-                  <TabsTrigger key={category} value={category!.toLowerCase()}>
+                  <TabsTrigger key={category} value={category.toLowerCase()}>
                     {category}
                   </TabsTrigger>
                 ))}
@@ -55,7 +57,7 @@ export default async function Home() {
                 {articles.map((article, index) => (
                   <Link key={index} href={`/article/${index}`} legacyBehavior>
                     <a>
-                      <ArticleCard {...article} category={article.catagory || article.category || 'Uncategorized'} />
+                      <ArticleCard {...article} category={article.category} />
                     </a>
                   </Link>
                 ))}
@@ -63,13 +65,13 @@ export default async function Home() {
 
               {/* Dynamic Category Tabs */}
               {categories.map((category) => (
-                <TabsContent key={category} value={category!.toLowerCase()} className="space-y-6">
+                <TabsContent key={category} value={category.toLowerCase()} className="space-y-6">
                   {articles
-                    .filter((article) => (article.catagory || article.category || 'Uncategorized') === category)
+                    .filter((article) => article.category === category)
                     .map((article, index) => (
                       <Link key={index} href={`/article/${index}`} legacyBehavior>
                         <a>
-                          <ArticleCard {...article} category={article.catagory || article.category || 'Uncategorized'} />
+                          <ArticleCard {...article} category={article.category} />
                         </a>
                       </Link>
                     ))}
