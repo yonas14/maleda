@@ -6,7 +6,7 @@ import Link from "next/link";
 
 export default function Sidebar() {
   return (
-    <aside className="w-full max-w-sm space-y-6">
+    <aside className="space-y-6 max-h-[calc(100vh-6rem)] overflow-y-auto scrollbar-hide">
       {/* Search */}
       <Card>
         <CardContent className="p-4">

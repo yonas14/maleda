@@ -41,9 +41,11 @@ export default async function Home() {
           </div>
         </main>
 
-        {/* Sidebar */}
-        <div className="w-full md:w-1/4 py-6 flex justify-center">
-          <Sidebar />
+        {/* Sidebar Container */}
+        <div className="w-full md:w-1/4 relative">
+          <div className="sticky top-6 py-6">
+            <Sidebar />
+          </div>
         </div>
       </div>
     </div>
