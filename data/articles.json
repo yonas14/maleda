@@ -1,11 +1,14 @@
 [
   {
-    "title": "You’re Using ChatGPT Wrong! Here’s How to Be Ahead of 99% of Users",
+    "title": "You're Using ChatGPT Wrong! Here's How to Be Ahead of 99% of Users",
     "description": "Master ChatGPT by learning prompt engineering.",
     "date": "Mar 17, 2023",
     "views": "38K",
     "comments": "793",
-    "image": "/robot.png"
+    "image": "/robot.png",
+    "category": "AI",
+    "author": "Sarah Chen",
+    "readTime": "5 min read"
   },
   {
     "title": "DIY AI & ML: Logistic Regression",
@@ -13,7 +16,10 @@
     "date": "1d ago",
     "views": "10",
     "comments": "1",
-    "image": "/ai-ml.png"
+    "image": "/ai-ml.png",
+    "category": "Tech",
+    "author": "Alex Kumar",
+    "readTime": "8 min read"
   },
   {
     "title": "The Future of AI: Predictions for 2030",
@@ -21,7 +27,10 @@
     "date": "Feb 10, 2024",
     "views": "25K",
     "comments": "102",
-    "image": "/ai-future.png"
+    "image": "/ai-future.png",
+    "category": "AI",
+    "author": "Michael Roberts",
+    "readTime": "6 min read"
   },
   {
     "title": "How to Build Scalable Web Apps with Next.js",
@@ -29,7 +38,10 @@
     "date": "Jan 28, 2024",
     "views": "18K",
     "comments": "56",
-    "image": "/nextjs-scalability.png"
+    "image": "/nextjs-scalability.png",
+    "category": "Tech",
+    "author": "David Wilson",
+    "readTime": "7 min read"
   },
   {
     "title": "The Rise of Decentralized Social Media",
@@ -37,7 +49,10 @@
     "date": "Dec 20, 2023",
     "views": "12K",
     "comments": "89",
-    "image": "/decentralized-social.png"
+    "image": "/decentralized-social.png",
+    "category": "Tech",
+    "author": "Emma Thompson",
+    "readTime": "4 min read"
   },
   {
     "title": "Understanding Web3 and Its Impact on the Internet",
@@ -45,7 +60,10 @@
     "date": "Nov 15, 2023",
     "views": "15K",
     "comments": "120",
-    "image": "/web3-impact.png"
+    "image": "/web3-impact.png",
+    "category": "Tech",
+    "author": "James Miller",
+    "readTime": "6 min read"
   },
   {
     "title": "The Psychology of Habit Formation",
@@ -53,7 +71,10 @@
     "date": "Oct 5, 2023",
     "views": "40K",
     "comments": "150",
-    "image": "/habit-formation.png"
+    "image": "/habit-formation.png",
+    "category": "Self Improvement",
+    "author": "Lisa Chen",
+    "readTime": "5 min read"
   },
   {
     "title": "Quantum Computing: What You Need to Know",
@@ -61,7 +82,10 @@
     "date": "Sep 30, 2023",
     "views": "22K",
     "comments": "98",
-    "image": "/quantum-computing.png"
+    "image": "/quantum-computing.png",
+    "category": "Tech",
+    "author": "Robert Chang",
+    "readTime": "8 min read"
   },
   {
     "title": "The Secret to Writing Engaging Blog Posts",
@@ -69,7 +93,10 @@
     "date": "Aug 22, 2023",
     "views": "30K",
     "comments": "210",
-    "image": "/writing-tips.png"
+    "image": "/writing-tips.png",
+    "category": "Writing",
+    "author": "Maria Garcia",
+    "readTime": "4 min read"
   },
   {
     "title": "Cybersecurity in 2024: Trends and Best Practices",
@@ -77,6 +104,9 @@
     "date": "Jul 10, 2023",
     "views": "19K",
     "comments": "132",
-    "image": "/cybersecurity.png"
+    "image": "/cybersecurity.png",
+    "category": "Cybersecurity",
+    "author": "Tom Anderson",
+    "readTime": "7 min read"
   }
 ]

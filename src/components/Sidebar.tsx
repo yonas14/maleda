@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 
 export default function Sidebar() {
   return (
-    <aside className="w-full md:w-1/3 space-y-6">
+    <aside className="w-full max-w-sm space-y-6">
       {/* Staff Picks */}
       <Card>
         <CardContent className="p-4">
@@ -13,7 +13,7 @@ export default function Sidebar() {
               <a href="#">Yes, Girl Scout Cookies are okay to eat</a>
             </li>
             <li className="text-gray-700 hover:text-black">
-              <a href="#">‘The Adopted’: I visited a WW2 soldier’s home</a>
+              <a href="#">'The Adopted': I visited a WW2 soldier's home</a>
             </li>
             <li className="text-gray-700 hover:text-black">
               <a href="#">Google DeepMind CEO on AGI</a>

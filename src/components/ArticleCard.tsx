@@ -8,9 +8,10 @@ type ArticleProps = {
   views: string;
   comments: string;
   image: string;
+  category?: string;
 };
 
-export default function ArticleCard({ title, description, date, views, comments, image }: ArticleProps) {
+export default function ArticleCard({ title, description, date, views, comments, image, category }: ArticleProps) {
   return (
     <Card className="flex gap-4">
       <CardContent className="p-4 flex-1">
@@ -20,6 +21,7 @@ export default function ArticleCard({ title, description, date, views, comments,
           <span>{date}</span>
           <span>{views}</span>
           <span>{comments}</span>
+          {category && <span>{category}</span>}
         </div>
       </CardContent>
       {/* <Image src={image} alt={title} width={120} height={80} className="rounded-md" /> */}
