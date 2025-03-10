@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useEffect, useState } from "react";
+import { useRef, useEffect, useState, useCallback } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import Link from "next/link";
@@ -28,14 +28,25 @@ export default function MainTabs({ articles, categories }: MainTabsProps) {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const tabsRef = useRef<HTMLDivElement>(null);
   const loadMoreRef = useRef<HTMLDivElement>(null);
+  const contentRef = useRef<HTMLDivElement>(null);
   const [showLeftArrow, setShowLeftArrow] = useState(false);
   const [showRightArrow, setShowRightArrow] = useState(true);
   const [isSticky, setIsSticky] = useState(false);
+  const [scrollProgress, setScrollProgress] = useState(0);
   const [visibleArticles, setVisibleArticles] = useState<Article[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [activeTab, setActiveTab] = useState("all");
   const [isLoading, setIsLoading] = useState(false);
   const articlesPerPage = 5;
+  const [isScrolling, setIsScrolling] = useState(false);
+  const scrollTimeoutRef = useRef<NodeJS.Timeout>();
+  const cardRefsMap = useRef(new Map<string, HTMLAnchorElement>()).current;
+
+  // Adjust these constants for a more noticeable fade
+  const TAB_HEIGHT = 80; // Height of the tab bar in pixels
+  const FADE_OFFSET = 300; // Start fading earlier
+  const SCROLL_DISTANCE = 150; // Shorter distance for more dramatic fade
+  const GRADIENT_HEIGHT = 200; // Height of the gradient effect
 
   // Calculate trending categories
   const trendingCategories = categories.map(category => {
@@ -110,13 +121,74 @@ export default function MainTabs({ articles, categories }: MainTabsProps) {
     };
   }, [currentPage, isLoading, activeTab]);
 
-  const handleScroll = () => {
-    if (!scrollContainerRef.current) return;
-    
-    const { scrollLeft, scrollWidth, clientWidth } = scrollContainerRef.current;
-    setShowLeftArrow(scrollLeft > 0);
-    setShowRightArrow(scrollLeft < scrollWidth - clientWidth - 10);
-  };
+  const handleScrollStart = useCallback((event?: Event) => {
+    setIsScrolling(true);
+    // Clear any existing timeout
+    if (scrollTimeoutRef.current) {
+      clearTimeout(scrollTimeoutRef.current);
+    }
+    // Set a new timeout to detect when scrolling stops
+    scrollTimeoutRef.current = setTimeout(() => {
+      setIsScrolling(false);
+    }, 150); // Adjust this value to control how quickly the fade disappears after scrolling stops
+  }, []);
+
+  useEffect(() => {
+    const scrollContainer = scrollContainerRef.current;
+    const tabsContainer = tabsRef.current;
+    const contentContainer = contentRef.current;
+    if (!scrollContainer || !tabsContainer || !contentContainer) return;
+
+    const handleWheel = (e: WheelEvent) => {
+      if (e.deltaY !== 0) {
+        e.preventDefault();
+        scrollContainer.scrollLeft += e.deltaY;
+        handleScrollStart();
+      }
+    };
+
+    const handlePageScroll = () => {
+      if (!tabsContainer || !contentContainer) return;
+      const rect = tabsContainer.getBoundingClientRect();
+      const isAtTop = rect.top === 0;
+      setIsSticky(isAtTop);
+      handleScrollStart();
+
+      // Calculate scroll progress for the gradient effect
+      const scrollTop = window.scrollY;
+      const viewportHeight = window.innerHeight;
+      const contentRect = contentContainer.getBoundingClientRect();
+      
+      // Calculate distances for top and bottom gradients
+      const distanceFromTop = rect.top - TAB_HEIGHT;
+      const distanceFromBottom = viewportHeight - contentRect.bottom;
+      
+      // Calculate progress based on scroll position
+      let progress;
+      if (distanceFromTop > FADE_OFFSET) {
+        progress = 0;
+      } else {
+        const effectiveScroll = FADE_OFFSET - distanceFromTop;
+        progress = Math.min(effectiveScroll / SCROLL_DISTANCE, 1);
+      }
+      
+      setScrollProgress(progress);
+    };
+
+    scrollContainer.addEventListener('wheel', handleWheel, { passive: false });
+    scrollContainer.addEventListener('scroll', handleScrollStart);
+    window.addEventListener('scroll', handlePageScroll);
+    handlePageScroll();
+
+    return () => {
+      scrollContainer.removeEventListener('wheel', handleWheel);
+      scrollContainer.removeEventListener('scroll', handleScrollStart);
+      window.removeEventListener('scroll', handlePageScroll);
+      if (scrollTimeoutRef.current) {
+        clearTimeout(scrollTimeoutRef.current);
+      }
+    };
+  }, [handleScrollStart]);
 
   const scroll = (direction: 'left' | 'right') => {
     if (!scrollContainerRef.current) return;
@@ -129,42 +201,45 @@ export default function MainTabs({ articles, categories }: MainTabsProps) {
     });
   };
 
-  useEffect(() => {
-    const scrollContainer = scrollContainerRef.current;
-    const tabsContainer = tabsRef.current;
-    if (!scrollContainer || !tabsContainer) return;
-
-    const handleWheel = (e: WheelEvent) => {
-      if (e.deltaY !== 0) {
-        e.preventDefault();
-        scrollContainer.scrollLeft += e.deltaY;
+  const updateCardOpacity = useCallback(() => {
+    if (!tabsRef.current) return;
+    
+    const tabBottom = tabsRef.current.getBoundingClientRect().bottom;
+    const fadeDistance = 300; // Distance over which the fade occurs
+    
+    cardRefsMap.forEach((cardEl, id) => {
+      if (cardEl) {
+        const rect = cardEl.getBoundingClientRect();
+        const distanceFromTab = rect.top - tabBottom;
+        
+        // Start fading immediately at tab bottom
+        if (distanceFromTab <= fadeDistance) {
+          // Ensure cards right under the tab start at minimum opacity
+          const opacity = Math.max(distanceFromTab / fadeDistance, 0);
+          cardEl.style.opacity = (opacity * 0.7 + 0.3).toString(); // Scale opacity between 0.3 and 1.0
+        } else {
+          cardEl.style.opacity = '1';
+        }
       }
-    };
-
-    const handlePageScroll = () => {
-      if (!tabsContainer) return;
-      const rect = tabsContainer.getBoundingClientRect();
-      setIsSticky(rect.top === 0);
-    };
-
-    scrollContainer.addEventListener('wheel', handleWheel, { passive: false });
-    scrollContainer.addEventListener('scroll', handleScroll);
-    window.addEventListener('scroll', handlePageScroll);
-    handleScroll();
-
-    return () => {
-      scrollContainer.removeEventListener('wheel', handleWheel);
-      scrollContainer.removeEventListener('scroll', handleScroll);
-      window.removeEventListener('scroll', handlePageScroll);
-    };
+    });
   }, []);
+
+  // Add scroll handler for card opacity with more frequent updates
+  useEffect(() => {
+    const handleScroll = () => {
+      requestAnimationFrame(updateCardOpacity);
+    };
+    
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [updateCardOpacity]);
 
   return (
     <Tabs defaultValue="all" className="w-full" onValueChange={handleTabChange}>
       <div 
         ref={tabsRef}
-        className={`sticky top-0 z-10 border-b border-gray-200 transition-colors duration-200 ${
-          isSticky ? 'bg-white shadow-sm' : 'bg-transparent'
+        className={`sticky top-0 z-50 border-b border-gray-200 transition-all duration-200 ${
+          isSticky ? 'bg-white/95 backdrop-blur-sm shadow-md' : 'bg-transparent'
         }`}
       >
         <div className="relative w-full">
@@ -220,42 +295,30 @@ export default function MainTabs({ articles, categories }: MainTabsProps) {
         </div>
       </div>
 
-      {/* All Articles */}
-      <TabsContent value="all" className="space-y-6 pt-16">
-        <div className="grid grid-cols-1 gap-6">
-          {visibleArticles.map((article, index) => (
-            <Link key={`${article.title}-${index}`} href={`/article/${index}`} legacyBehavior>
-              <a>
-                <ArticleCard {...article} category={article.category} />
-              </a>
-            </Link>
-          ))}
-          {/* Loading indicator and intersection observer target */}
-          <div ref={loadMoreRef} className="w-full py-4 flex justify-center">
-            {isLoading && (
-              <div className="animate-pulse flex space-x-4">
-                <div className="h-2 w-2 bg-gray-400 rounded-full"></div>
-                <div className="h-2 w-2 bg-gray-400 rounded-full"></div>
-                <div className="h-2 w-2 bg-gray-400 rounded-full"></div>
-              </div>
-            )}
-          </div>
-        </div>
-      </TabsContent>
-
-      {/* Dynamic Category Tabs */}
-      {trendingCategories.map((category) => (
-        <TabsContent key={category} value={category.toLowerCase()} className="space-y-6 pt-16">
+      {/* Content Container without gradient overlays */}
+      <div ref={contentRef} className="relative max-w-[95%] mx-auto">
+        {/* All Articles */}
+        <TabsContent value="all" className="space-y-6 pt-16">
           <div className="grid grid-cols-1 gap-6">
-            {visibleArticles
-              .filter((article) => article.category === category)
-              .map((article, index) => (
-                <Link key={`${article.title}-${index}`} href={`/article/${index}`} legacyBehavior>
-                  <a>
+            {visibleArticles.map((article, index) => {
+              const cardId = `${article.title}-${index}`;
+              return (
+                <Link key={cardId} href={`/article/${index}`} legacyBehavior>
+                  <a 
+                    ref={(el) => {
+                      if (el) {
+                        cardRefsMap.set(cardId, el);
+                      } else {
+                        cardRefsMap.delete(cardId);
+                      }
+                    }}
+                    className="transition-opacity duration-200"
+                  >
                     <ArticleCard {...article} category={article.category} />
                   </a>
                 </Link>
-              ))}
+              );
+            })}
             {/* Loading indicator and intersection observer target */}
             <div ref={loadMoreRef} className="w-full py-4 flex justify-center">
               {isLoading && (
@@ -268,7 +331,46 @@ export default function MainTabs({ articles, categories }: MainTabsProps) {
             </div>
           </div>
         </TabsContent>
-      ))}
+
+        {/* Dynamic Category Tabs */}
+        {trendingCategories.map((category) => (
+          <TabsContent key={category} value={category.toLowerCase()} className="space-y-6 pt-16">
+            <div className="grid grid-cols-1 gap-6">
+              {visibleArticles
+                .filter((article) => article.category === category)
+                .map((article, index) => {
+                  const cardId = `${article.title}-${category}-${index}`;
+                  return (
+                    <Link key={cardId} href={`/article/${index}`} legacyBehavior>
+                      <a 
+                        ref={(el) => {
+                          if (el) {
+                            cardRefsMap.set(cardId, el);
+                          } else {
+                            cardRefsMap.delete(cardId);
+                          }
+                        }}
+                        className="transition-opacity duration-200"
+                      >
+                        <ArticleCard {...article} category={article.category} />
+                      </a>
+                    </Link>
+                  );
+                })}
+              {/* Loading indicator and intersection observer target */}
+              <div ref={loadMoreRef} className="w-full py-4 flex justify-center">
+                {isLoading && (
+                  <div className="animate-pulse flex space-x-4">
+                    <div className="h-2 w-2 bg-gray-400 rounded-full"></div>
+                    <div className="h-2 w-2 bg-gray-400 rounded-full"></div>
+                    <div className="h-2 w-2 bg-gray-400 rounded-full"></div>
+                  </div>
+                )}
+              </div>
+            </div>
+          </TabsContent>
+        ))}
+      </div>
     </Tabs>
   );
 } 
