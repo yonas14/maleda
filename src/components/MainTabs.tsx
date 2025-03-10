@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useEffect, useState, useCallback } from "react";
+import { useRef, useEffect, useState, useCallback, forwardRef, useImperativeHandle } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import Link from "next/link";
@@ -24,6 +24,20 @@ type MainTabsProps = {
   categories: string[];
 };
 
+// Define the Card component with forwardRef
+const Card = forwardRef<HTMLAnchorElement, { article: Article; href: string; index: number }>(
+  ({ article, href, index }, ref) => {
+    return (
+      <Link href={href} legacyBehavior>
+        <a ref={ref} className="transition-opacity duration-200">
+          <ArticleCard {...article} category={article.category} />
+        </a>
+      </Link>
+    );
+  }
+);
+Card.displayName = 'Card';
+
 export default function MainTabs({ articles, categories }: MainTabsProps) {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const tabsRef = useRef<HTMLDivElement>(null);
@@ -40,7 +54,7 @@ export default function MainTabs({ articles, categories }: MainTabsProps) {
   const articlesPerPage = 5;
   const [isScrolling, setIsScrolling] = useState(false);
   const scrollTimeoutRef = useRef<NodeJS.Timeout>();
-  const cardRefsMap = useRef(new Map<string, HTMLAnchorElement>()).current;
+  const cardRefs = useRef<Map<string, HTMLAnchorElement>>(new Map());
 
   // Adjust these constants for a more noticeable fade
   const TAB_HEIGHT = 80; // Height of the tab bar in pixels
@@ -204,20 +218,26 @@ export default function MainTabs({ articles, categories }: MainTabsProps) {
   const updateCardOpacity = useCallback(() => {
     if (!tabsRef.current) return;
     
-    const tabBottom = tabsRef.current.getBoundingClientRect().bottom;
-    const fadeDistance = 300; // Distance over which the fade occurs
+    const tabRect = tabsRef.current.getBoundingClientRect();
+    const fadeDistance = 100; // Reduced fade distance for shorter gradient
     
-    cardRefsMap.forEach((cardEl, id) => {
+    cardRefs.current.forEach((cardEl, id) => {
       if (cardEl) {
         const rect = cardEl.getBoundingClientRect();
-        const distanceFromTab = rect.top - tabBottom;
+        const cardIntersectTab = rect.top < (tabRect.bottom + 2) && rect.bottom > tabRect.bottom;
+        const distanceFromTab = rect.top - tabRect.bottom;
         
-        // Start fading immediately at tab bottom
-        if (distanceFromTab <= fadeDistance) {
-          // Ensure cards right under the tab start at minimum opacity
-          const opacity = Math.max(distanceFromTab / fadeDistance, 0);
-          cardEl.style.opacity = (opacity * 0.7 + 0.3).toString(); // Scale opacity between 0.3 and 1.0
+        if (cardIntersectTab) {
+          // Calculate how much of the card is under the tab, using a smaller portion
+          const intersectAmount = Math.min(1, (rect.bottom - tabRect.bottom) / (rect.height * 0.5));
+          const opacity = Math.max(0, 1 - intersectAmount);
+          cardEl.style.opacity = (opacity * 0.85 + 0.15).toString(); // Scale between 0.15 and 1.0
+        } else if (distanceFromTab > 0 && distanceFromTab < fadeDistance) {
+          // Card is just below the tab, quick fade back to full opacity
+          const fadeProgress = distanceFromTab / fadeDistance;
+          cardEl.style.opacity = (fadeProgress * 0.85 + 0.15).toString();
         } else {
+          // Card is completely outside the fade zone
           cardEl.style.opacity = '1';
         }
       }
@@ -233,6 +253,14 @@ export default function MainTabs({ articles, categories }: MainTabsProps) {
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, [updateCardOpacity]);
+
+  const setCardRef = useCallback((element: HTMLAnchorElement | null, id: string) => {
+    if (element) {
+      cardRefs.current.set(id, element);
+    } else {
+      cardRefs.current.delete(id);
+    }
+  }, []);
 
   return (
     <Tabs defaultValue="all" className="w-full" onValueChange={handleTabChange}>
@@ -303,20 +331,13 @@ export default function MainTabs({ articles, categories }: MainTabsProps) {
             {visibleArticles.map((article, index) => {
               const cardId = `${article.title}-${index}`;
               return (
-                <Link key={cardId} href={`/article/${index}`} legacyBehavior>
-                  <a 
-                    ref={(el) => {
-                      if (el) {
-                        cardRefsMap.set(cardId, el);
-                      } else {
-                        cardRefsMap.delete(cardId);
-                      }
-                    }}
-                    className="transition-opacity duration-200"
-                  >
-                    <ArticleCard {...article} category={article.category} />
-                  </a>
-                </Link>
+                <Card
+                  key={cardId}
+                  ref={(el) => setCardRef(el, cardId)}
+                  article={article}
+                  href={`/article/${index}`}
+                  index={index}
+                />
               );
             })}
             {/* Loading indicator and intersection observer target */}
@@ -341,20 +362,13 @@ export default function MainTabs({ articles, categories }: MainTabsProps) {
                 .map((article, index) => {
                   const cardId = `${article.title}-${category}-${index}`;
                   return (
-                    <Link key={cardId} href={`/article/${index}`} legacyBehavior>
-                      <a 
-                        ref={(el) => {
-                          if (el) {
-                            cardRefsMap.set(cardId, el);
-                          } else {
-                            cardRefsMap.delete(cardId);
-                          }
-                        }}
-                        className="transition-opacity duration-200"
-                      >
-                        <ArticleCard {...article} category={article.category} />
-                      </a>
-                    </Link>
+                    <Card
+                      key={cardId}
+                      ref={(el) => setCardRef(el, cardId)}
+                      article={article}
+                      href={`/article/${index}`}
+                      index={index}
+                    />
                   );
                 })}
               {/* Loading indicator and intersection observer target */}
