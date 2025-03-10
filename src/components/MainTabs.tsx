@@ -1,58 +1,14 @@
 'use client';
 
-import { useRef, useEffect, useState, useCallback, forwardRef, useImperativeHandle } from "react";
+import { useRef, useEffect, useState, useCallback } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import Link from "next/link";
-import ArticleCard from "./ArticleCard";
-
-type Article = {
-  title: string;
-  description: string;
-  date: string;
-  views: string;
-  comments: string;
-  image: string;
-  category: string;
-  content: string;
-  author: string;
-  readTime: string;
-};
+import Card, { Article, CardRef } from "./Card";
 
 type MainTabsProps = {
   articles: Article[];
   categories: string[];
 };
-
-type CardRef = {
-  element: HTMLAnchorElement | null;
-};
-
-type CardProps = {
-  article: Article;
-  href: string;
-  index: number;
-};
-
-const Card = forwardRef<CardRef, CardProps>(({ article, href, index }, ref) => {
-  const linkRef = useRef<HTMLAnchorElement>(null);
-
-  useImperativeHandle(ref, () => ({
-    element: linkRef.current
-  }), []);
-
-  return (
-    <Link 
-      href={href}
-      ref={linkRef}
-      className="transition-opacity duration-200"
-    >
-      <ArticleCard {...article} category={article.category} />
-    </Link>
-  );
-});
-
-Card.displayName = 'Card';
 
 export default function MainTabs({ articles, categories }: MainTabsProps) {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -232,7 +188,7 @@ export default function MainTabs({ articles, categories }: MainTabsProps) {
   };
 
   const setCardRef = useCallback((element: CardRef | null, id: string) => {
-    if (element?.element) {
+    if (element) {
       cardRefs.current.set(id, element);
     } else {
       cardRefs.current.delete(id);
@@ -288,10 +244,10 @@ export default function MainTabs({ articles, categories }: MainTabsProps) {
             style={{ WebkitOverflowScrolling: 'touch' }}
           >
             <div className="inline-flex min-w-full justify-center">
-              <TabsList className="flex gap-2 sm:gap-4 pt-6 mb-4 w-max bg-transparent px-4 sm:px-6 border-0">
+              <TabsList className="flex gap-4 pt-6 mb-4 w-max bg-transparent px-6 border-0">
                 <TabsTrigger 
                   value="all"
-                  className="px-4 sm:px-8 py-2.5 rounded-full text-sm font-medium transition-all data-[state=active]:bg-black data-[state=active]:text-white data-[state=active]:shadow-sm hover:bg-gray-50/50 data-[state=active]:hover:bg-black/90 whitespace-nowrap flex-shrink-0 bg-transparent"
+                  className="px-8 py-2.5 rounded-full text-sm font-medium transition-all data-[state=active]:bg-black data-[state=active]:text-white data-[state=active]:shadow-sm hover:bg-gray-50/50 data-[state=active]:hover:bg-black/90 whitespace-nowrap flex-shrink-0 bg-transparent"
                 >
                   All
                 </TabsTrigger>
@@ -299,7 +255,7 @@ export default function MainTabs({ articles, categories }: MainTabsProps) {
                   <TabsTrigger 
                     key={category} 
                     value={category.toLowerCase()}
-                    className="px-4 sm:px-8 py-2.5 rounded-full text-sm font-medium transition-all data-[state=active]:bg-black data-[state=active]:text-white data-[state=active]:shadow-sm hover:bg-gray-50/50 data-[state=active]:hover:bg-black/90 whitespace-nowrap flex-shrink-0 bg-transparent"
+                    className="px-8 py-2.5 rounded-full text-sm font-medium transition-all data-[state=active]:bg-black data-[state=active]:text-white data-[state=active]:shadow-sm hover:bg-gray-50/50 data-[state=active]:hover:bg-black/90 whitespace-nowrap flex-shrink-0 bg-transparent"
                   >
                     {category}
                   </TabsTrigger>
@@ -307,6 +263,10 @@ export default function MainTabs({ articles, categories }: MainTabsProps) {
               </TabsList>
             </div>
           </div>
+
+          <div className={`absolute right-0 top-0 bottom-0 w-24 bg-gradient-to-l ${
+            isSticky ? 'from-white' : 'from-transparent'
+          } to-transparent z-10 pointer-events-none`}></div>
         </div>
       </div>
 
