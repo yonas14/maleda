@@ -28,10 +28,12 @@ type MainTabsProps = {
 const Card = forwardRef<HTMLAnchorElement, { article: Article; href: string; index: number }>(
   ({ article, href, index }, ref) => {
     return (
-      <Link href={href} legacyBehavior>
-        <a ref={ref} className="transition-opacity duration-200">
-          <ArticleCard {...article} category={article.category} />
-        </a>
+      <Link 
+        href={href}
+        ref={ref}
+        className="transition-opacity duration-200"
+      >
+        <ArticleCard {...article} category={article.category} />
       </Link>
     );
   }
@@ -53,7 +55,7 @@ export default function MainTabs({ articles, categories }: MainTabsProps) {
   const [isLoading, setIsLoading] = useState(false);
   const articlesPerPage = 5;
   const [isScrolling, setIsScrolling] = useState(false);
-  const scrollTimeoutRef = useRef<NodeJS.Timeout>();
+  const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const cardRefs = useRef<Map<string, HTMLAnchorElement>>(new Map());
 
   // Adjust these constants for a more noticeable fade
@@ -220,24 +222,35 @@ export default function MainTabs({ articles, categories }: MainTabsProps) {
     
     const tabRect = tabsRef.current.getBoundingClientRect();
     const fadeDistance = 100; // Reduced fade distance for shorter gradient
+    const viewportHeight = window.innerHeight;
     
     cardRefs.current.forEach((cardEl, id) => {
       if (cardEl) {
         const rect = cardEl.getBoundingClientRect();
+        
+        // Top gradient (tab intersection)
         const cardIntersectTab = rect.top < (tabRect.bottom + 2) && rect.bottom > tabRect.bottom;
         const distanceFromTab = rect.top - tabRect.bottom;
         
+        // Bottom gradient (viewport entry)
+        const distanceFromBottom = viewportHeight - rect.top;
+        const isEnteringFromBottom = rect.top > viewportHeight - 200; // Start fade 200px before entering
+        
         if (cardIntersectTab) {
-          // Calculate how much of the card is under the tab, using a smaller portion
+          // Calculate how much of the card is under the tab
           const intersectAmount = Math.min(1, (rect.bottom - tabRect.bottom) / (rect.height * 0.5));
           const opacity = Math.max(0, 1 - intersectAmount);
-          cardEl.style.opacity = (opacity * 0.85 + 0.15).toString(); // Scale between 0.15 and 1.0
+          cardEl.style.opacity = (opacity * 0.85 + 0.15).toString();
+        } else if (isEnteringFromBottom) {
+          // Calculate fade in effect when entering from bottom
+          const fadeProgress = Math.max(0, Math.min(1, distanceFromBottom / 200));
+          cardEl.style.opacity = fadeProgress.toString();
         } else if (distanceFromTab > 0 && distanceFromTab < fadeDistance) {
-          // Card is just below the tab, quick fade back to full opacity
+          // Normal fade back to full opacity below tab
           const fadeProgress = distanceFromTab / fadeDistance;
           cardEl.style.opacity = (fadeProgress * 0.85 + 0.15).toString();
         } else {
-          // Card is completely outside the fade zone
+          // Card is completely outside both fade zones
           cardEl.style.opacity = '1';
         }
       }
@@ -286,11 +299,11 @@ export default function MainTabs({ articles, categories }: MainTabsProps) {
             className="w-full overflow-x-auto scrollbar-hide cursor-grab active:cursor-grabbing"
             style={{ WebkitOverflowScrolling: 'touch' }}
           >
-            <div className="inline-flex min-w-full">
-              <TabsList className="flex gap-3 pt-6 mb-4 w-max bg-transparent pl-6 pr-12">
+            <div className="inline-flex min-w-full justify-center">
+              <TabsList className="flex gap-4 pt-6 mb-4 w-max bg-transparent px-6 border-0">
                 <TabsTrigger 
                   value="all"
-                  className="px-6 py-2.5 rounded-full text-sm font-medium transition-all data-[state=active]:bg-black data-[state=active]:text-white data-[state=active]:shadow-sm hover:bg-gray-50 data-[state=active]:hover:bg-black/90 whitespace-nowrap flex-shrink-0"
+                  className="px-8 py-2.5 rounded-full text-sm font-medium transition-all data-[state=active]:bg-black data-[state=active]:text-white data-[state=active]:shadow-sm hover:bg-gray-50/50 data-[state=active]:hover:bg-black/90 whitespace-nowrap flex-shrink-0 bg-transparent"
                 >
                   All
                 </TabsTrigger>
@@ -298,7 +311,7 @@ export default function MainTabs({ articles, categories }: MainTabsProps) {
                   <TabsTrigger 
                     key={category} 
                     value={category.toLowerCase()}
-                    className="px-6 py-2.5 rounded-full text-sm font-medium transition-all data-[state=active]:bg-black data-[state=active]:text-white data-[state=active]:shadow-sm hover:bg-gray-50 data-[state=active]:hover:bg-black/90 whitespace-nowrap flex-shrink-0"
+                    className="px-8 py-2.5 rounded-full text-sm font-medium transition-all data-[state=active]:bg-black data-[state=active]:text-white data-[state=active]:shadow-sm hover:bg-gray-50/50 data-[state=active]:hover:bg-black/90 whitespace-nowrap flex-shrink-0 bg-transparent"
                   >
                     {category}
                   </TabsTrigger>
@@ -307,16 +320,6 @@ export default function MainTabs({ articles, categories }: MainTabsProps) {
             </div>
           </div>
 
-          {showRightArrow && (
-            <button 
-              onClick={() => scroll('right')}
-              className="absolute right-2 top-1/2 -translate-y-1/2 z-20 p-2 rounded-full bg-white shadow-md hover:bg-gray-50 transition-all"
-              aria-label="Scroll right"
-            >
-              <ChevronRight className="h-4 w-4" />
-            </button>
-          )}
-          
           <div className={`absolute right-0 top-0 bottom-0 w-24 bg-gradient-to-l ${
             isSticky ? 'from-white' : 'from-transparent'
           } to-transparent z-10 pointer-events-none`}></div>
@@ -333,10 +336,10 @@ export default function MainTabs({ articles, categories }: MainTabsProps) {
               return (
                 <Card
                   key={cardId}
-                  ref={(el) => setCardRef(el, cardId)}
                   article={article}
                   href={`/article/${index}`}
                   index={index}
+                  ref={(el) => setCardRef(el, cardId)}
                 />
               );
             })}
@@ -364,10 +367,10 @@ export default function MainTabs({ articles, categories }: MainTabsProps) {
                   return (
                     <Card
                       key={cardId}
-                      ref={(el) => setCardRef(el, cardId)}
                       article={article}
                       href={`/article/${index}`}
                       index={index}
+                      ref={(el) => setCardRef(el, cardId)}
                     />
                   );
                 })}
@@ -387,4 +390,4 @@ export default function MainTabs({ articles, categories }: MainTabsProps) {
       </div>
     </Tabs>
   );
-} 
+}
