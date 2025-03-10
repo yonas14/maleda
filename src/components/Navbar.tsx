@@ -7,7 +7,7 @@ export default function Navbar() {
     <header className="bg-white shadow-md px-4 sm:px-6 py-3 sm:py-4">
       <div className="max-w-6xl mx-auto flex items-center gap-4">
         <div className="flex items-center gap-3 sm:gap-6 flex-1">
-          <h1 className="text-xl sm:text-2xl font-bold">Zenna</h1>
+          <h1 className="text-xl sm:text-2xl font-bold">maleda</h1>
           <div className="relative flex-1 max-w-[500px]">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
             <Input 
