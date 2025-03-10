@@ -24,18 +24,34 @@ type MainTabsProps = {
   categories: string[];
 };
 
-// Define the Card component with forwardRef
-const Card = forwardRef<HTMLAnchorElement, { article: Article; href: string; index: number }>(
-  ({ article, href, index }, ref) => {
-    return (
-      <Link href={href} legacyBehavior>
-        <a ref={ref} className="transition-opacity duration-200">
-          <ArticleCard {...article} category={article.category} />
-        </a>
-      </Link>
-    );
-  }
-);
+type CardRef = {
+  element: HTMLAnchorElement | null;
+};
+
+type CardProps = {
+  article: Article;
+  href: string;
+  index: number;
+};
+
+const Card = forwardRef<CardRef, CardProps>(({ article, href, index }, ref) => {
+  const linkRef = useRef<HTMLAnchorElement>(null);
+
+  useImperativeHandle(ref, () => ({
+    element: linkRef.current
+  }), []);
+
+  return (
+    <Link 
+      href={href}
+      ref={linkRef}
+      className="transition-opacity duration-200"
+    >
+      <ArticleCard {...article} category={article.category} />
+    </Link>
+  );
+});
+
 Card.displayName = 'Card';
 
 export default function MainTabs({ articles, categories }: MainTabsProps) {
@@ -53,8 +69,8 @@ export default function MainTabs({ articles, categories }: MainTabsProps) {
   const [isLoading, setIsLoading] = useState(false);
   const articlesPerPage = 5;
   const [isScrolling, setIsScrolling] = useState(false);
-  const scrollTimeoutRef = useRef<NodeJS.Timeout>();
-  const cardRefs = useRef<Map<string, HTMLAnchorElement>>(new Map());
+  const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const cardRefs = useRef<Map<string, CardRef>>(new Map());
 
   // Adjust these constants for a more noticeable fade
   const TAB_HEIGHT = 80; // Height of the tab bar in pixels
@@ -215,29 +231,32 @@ export default function MainTabs({ articles, categories }: MainTabsProps) {
     });
   };
 
+  const setCardRef = useCallback((element: CardRef | null, id: string) => {
+    if (element?.element) {
+      cardRefs.current.set(id, element);
+    } else {
+      cardRefs.current.delete(id);
+    }
+  }, []);
+
   const updateCardOpacity = useCallback(() => {
     if (!tabsRef.current) return;
     
-    const tabRect = tabsRef.current.getBoundingClientRect();
-    const fadeDistance = 100; // Reduced fade distance for shorter gradient
+    const viewportHeight = window.innerHeight;
     
-    cardRefs.current.forEach((cardEl, id) => {
+    cardRefs.current.forEach((cardRef, id) => {
+      const cardEl = cardRef.element;
       if (cardEl) {
         const rect = cardEl.getBoundingClientRect();
-        const cardIntersectTab = rect.top < (tabRect.bottom + 2) && rect.bottom > tabRect.bottom;
-        const distanceFromTab = rect.top - tabRect.bottom;
         
-        if (cardIntersectTab) {
-          // Calculate how much of the card is under the tab, using a smaller portion
-          const intersectAmount = Math.min(1, (rect.bottom - tabRect.bottom) / (rect.height * 0.5));
-          const opacity = Math.max(0, 1 - intersectAmount);
-          cardEl.style.opacity = (opacity * 0.85 + 0.15).toString(); // Scale between 0.15 and 1.0
-        } else if (distanceFromTab > 0 && distanceFromTab < fadeDistance) {
-          // Card is just below the tab, quick fade back to full opacity
-          const fadeProgress = distanceFromTab / fadeDistance;
-          cardEl.style.opacity = (fadeProgress * 0.85 + 0.15).toString();
+        // Bottom gradient (viewport entry)
+        const distanceFromBottom = viewportHeight - rect.top;
+        const isEnteringFromBottom = rect.top > viewportHeight - 200;
+        
+        if (isEnteringFromBottom) {
+          const fadeProgress = Math.max(0, Math.min(1, distanceFromBottom / 200));
+          cardEl.style.opacity = fadeProgress.toString();
         } else {
-          // Card is completely outside the fade zone
           cardEl.style.opacity = '1';
         }
       }
@@ -254,43 +273,25 @@ export default function MainTabs({ articles, categories }: MainTabsProps) {
     return () => window.removeEventListener('scroll', handleScroll);
   }, [updateCardOpacity]);
 
-  const setCardRef = useCallback((element: HTMLAnchorElement | null, id: string) => {
-    if (element) {
-      cardRefs.current.set(id, element);
-    } else {
-      cardRefs.current.delete(id);
-    }
-  }, []);
-
   return (
     <Tabs defaultValue="all" className="w-full" onValueChange={handleTabChange}>
       <div 
         ref={tabsRef}
-        className={`sticky top-0 z-50 border-b border-gray-200 transition-all duration-200 ${
-          isSticky ? 'bg-white/95 backdrop-blur-sm shadow-md' : 'bg-transparent'
+        className={`sticky top-0 z-50 border-b border-gray-200 transition-all duration-300 ${
+          isSticky ? 'bg-white shadow-lg backdrop-blur-md' : 'bg-white/80 backdrop-blur-sm'
         }`}
       >
         <div className="relative w-full">
-          {showLeftArrow && (
-            <button 
-              onClick={() => scroll('left')}
-              className="absolute left-2 top-1/2 -translate-y-1/2 z-20 p-2 rounded-full bg-white shadow-md hover:bg-gray-50 transition-all"
-              aria-label="Scroll left"
-            >
-              <ChevronLeft className="h-4 w-4" />
-            </button>
-          )}
-          
           <div 
             ref={scrollContainerRef}
-            className="w-full overflow-x-auto scrollbar-hide cursor-grab active:cursor-grabbing"
+            className="w-full overflow-x-auto scrollbar-hide"
             style={{ WebkitOverflowScrolling: 'touch' }}
           >
-            <div className="inline-flex min-w-full">
-              <TabsList className="flex gap-3 pt-6 mb-4 w-max bg-transparent pl-6 pr-12">
+            <div className="inline-flex min-w-full justify-center">
+              <TabsList className="flex gap-2 sm:gap-4 pt-6 mb-4 w-max bg-transparent px-4 sm:px-6 border-0">
                 <TabsTrigger 
                   value="all"
-                  className="px-6 py-2.5 rounded-full text-sm font-medium transition-all data-[state=active]:bg-black data-[state=active]:text-white data-[state=active]:shadow-sm hover:bg-gray-50 data-[state=active]:hover:bg-black/90 whitespace-nowrap flex-shrink-0"
+                  className="px-4 sm:px-8 py-2.5 rounded-full text-sm font-medium transition-all data-[state=active]:bg-black data-[state=active]:text-white data-[state=active]:shadow-sm hover:bg-gray-50/50 data-[state=active]:hover:bg-black/90 whitespace-nowrap flex-shrink-0 bg-transparent"
                 >
                   All
                 </TabsTrigger>
@@ -298,7 +299,7 @@ export default function MainTabs({ articles, categories }: MainTabsProps) {
                   <TabsTrigger 
                     key={category} 
                     value={category.toLowerCase()}
-                    className="px-6 py-2.5 rounded-full text-sm font-medium transition-all data-[state=active]:bg-black data-[state=active]:text-white data-[state=active]:shadow-sm hover:bg-gray-50 data-[state=active]:hover:bg-black/90 whitespace-nowrap flex-shrink-0"
+                    className="px-4 sm:px-8 py-2.5 rounded-full text-sm font-medium transition-all data-[state=active]:bg-black data-[state=active]:text-white data-[state=active]:shadow-sm hover:bg-gray-50/50 data-[state=active]:hover:bg-black/90 whitespace-nowrap flex-shrink-0 bg-transparent"
                   >
                     {category}
                   </TabsTrigger>
@@ -306,20 +307,6 @@ export default function MainTabs({ articles, categories }: MainTabsProps) {
               </TabsList>
             </div>
           </div>
-
-          {showRightArrow && (
-            <button 
-              onClick={() => scroll('right')}
-              className="absolute right-2 top-1/2 -translate-y-1/2 z-20 p-2 rounded-full bg-white shadow-md hover:bg-gray-50 transition-all"
-              aria-label="Scroll right"
-            >
-              <ChevronRight className="h-4 w-4" />
-            </button>
-          )}
-          
-          <div className={`absolute right-0 top-0 bottom-0 w-24 bg-gradient-to-l ${
-            isSticky ? 'from-white' : 'from-transparent'
-          } to-transparent z-10 pointer-events-none`}></div>
         </div>
       </div>
 
@@ -333,10 +320,10 @@ export default function MainTabs({ articles, categories }: MainTabsProps) {
               return (
                 <Card
                   key={cardId}
-                  ref={(el) => setCardRef(el, cardId)}
                   article={article}
                   href={`/article/${index}`}
                   index={index}
+                  ref={(el) => setCardRef(el, cardId)}
                 />
               );
             })}
@@ -364,10 +351,10 @@ export default function MainTabs({ articles, categories }: MainTabsProps) {
                   return (
                     <Card
                       key={cardId}
-                      ref={(el) => setCardRef(el, cardId)}
                       article={article}
                       href={`/article/${index}`}
                       index={index}
+                      ref={(el) => setCardRef(el, cardId)}
                     />
                   );
                 })}
@@ -387,4 +374,4 @@ export default function MainTabs({ articles, categories }: MainTabsProps) {
       </div>
     </Tabs>
   );
-} 
+}
