@@ -220,37 +220,22 @@ export default function MainTabs({ articles, categories }: MainTabsProps) {
   const updateCardOpacity = useCallback(() => {
     if (!tabsRef.current) return;
     
-    const tabRect = tabsRef.current.getBoundingClientRect();
-    const fadeDistance = 100; // Reduced fade distance for shorter gradient
     const viewportHeight = window.innerHeight;
     
     cardRefs.current.forEach((cardEl, id) => {
       if (cardEl) {
         const rect = cardEl.getBoundingClientRect();
         
-        // Top gradient (tab intersection)
-        const cardIntersectTab = rect.top < (tabRect.bottom + 2) && rect.bottom > tabRect.bottom;
-        const distanceFromTab = rect.top - tabRect.bottom;
-        
         // Bottom gradient (viewport entry)
         const distanceFromBottom = viewportHeight - rect.top;
         const isEnteringFromBottom = rect.top > viewportHeight - 200; // Start fade 200px before entering
         
-        if (cardIntersectTab) {
-          // Calculate how much of the card is under the tab
-          const intersectAmount = Math.min(1, (rect.bottom - tabRect.bottom) / (rect.height * 0.5));
-          const opacity = Math.max(0, 1 - intersectAmount);
-          cardEl.style.opacity = (opacity * 0.85 + 0.15).toString();
-        } else if (isEnteringFromBottom) {
+        if (isEnteringFromBottom) {
           // Calculate fade in effect when entering from bottom
           const fadeProgress = Math.max(0, Math.min(1, distanceFromBottom / 200));
           cardEl.style.opacity = fadeProgress.toString();
-        } else if (distanceFromTab > 0 && distanceFromTab < fadeDistance) {
-          // Normal fade back to full opacity below tab
-          const fadeProgress = distanceFromTab / fadeDistance;
-          cardEl.style.opacity = (fadeProgress * 0.85 + 0.15).toString();
         } else {
-          // Card is completely outside both fade zones
+          // Card is outside the fade zone
           cardEl.style.opacity = '1';
         }
       }
@@ -284,26 +269,16 @@ export default function MainTabs({ articles, categories }: MainTabsProps) {
         }`}
       >
         <div className="relative w-full">
-          {showLeftArrow && (
-            <button 
-              onClick={() => scroll('left')}
-              className="absolute left-2 top-1/2 -translate-y-1/2 z-20 p-2 rounded-full bg-white shadow-md hover:bg-gray-50 transition-all"
-              aria-label="Scroll left"
-            >
-              <ChevronLeft className="h-4 w-4" />
-            </button>
-          )}
-          
           <div 
             ref={scrollContainerRef}
-            className="w-full overflow-x-auto scrollbar-hide cursor-grab active:cursor-grabbing"
+            className="w-full overflow-x-auto scrollbar-hide"
             style={{ WebkitOverflowScrolling: 'touch' }}
           >
             <div className="inline-flex min-w-full justify-center">
-              <TabsList className="flex gap-4 pt-6 mb-4 w-max bg-transparent px-6 border-0">
+              <TabsList className="flex gap-2 sm:gap-4 pt-6 mb-4 w-max bg-transparent px-4 sm:px-6 border-0">
                 <TabsTrigger 
                   value="all"
-                  className="px-8 py-2.5 rounded-full text-sm font-medium transition-all data-[state=active]:bg-black data-[state=active]:text-white data-[state=active]:shadow-sm hover:bg-gray-50/50 data-[state=active]:hover:bg-black/90 whitespace-nowrap flex-shrink-0 bg-transparent"
+                  className="px-4 sm:px-8 py-2.5 rounded-full text-sm font-medium transition-all data-[state=active]:bg-black data-[state=active]:text-white data-[state=active]:shadow-sm hover:bg-gray-50/50 data-[state=active]:hover:bg-black/90 whitespace-nowrap flex-shrink-0 bg-transparent"
                 >
                   All
                 </TabsTrigger>
@@ -311,7 +286,7 @@ export default function MainTabs({ articles, categories }: MainTabsProps) {
                   <TabsTrigger 
                     key={category} 
                     value={category.toLowerCase()}
-                    className="px-8 py-2.5 rounded-full text-sm font-medium transition-all data-[state=active]:bg-black data-[state=active]:text-white data-[state=active]:shadow-sm hover:bg-gray-50/50 data-[state=active]:hover:bg-black/90 whitespace-nowrap flex-shrink-0 bg-transparent"
+                    className="px-4 sm:px-8 py-2.5 rounded-full text-sm font-medium transition-all data-[state=active]:bg-black data-[state=active]:text-white data-[state=active]:shadow-sm hover:bg-gray-50/50 data-[state=active]:hover:bg-black/90 whitespace-nowrap flex-shrink-0 bg-transparent"
                   >
                     {category}
                   </TabsTrigger>
@@ -319,10 +294,6 @@ export default function MainTabs({ articles, categories }: MainTabsProps) {
               </TabsList>
             </div>
           </div>
-
-          <div className={`absolute right-0 top-0 bottom-0 w-24 bg-gradient-to-l ${
-            isSticky ? 'from-white' : 'from-transparent'
-          } to-transparent z-10 pointer-events-none`}></div>
         </div>
       </div>
 

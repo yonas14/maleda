@@ -29,24 +29,15 @@ export default async function Home() {
   const categories = Array.from(new Set(articles.map(article => article.category)));
   
   return (
-    <div className="bg-gray min-h-screen">
+    <div className="min-h-screen bg-gray-50">
       <Navbar />
-
-      {/* Main Layout */}
-      <div className="max-w-6xl mx-auto flex flex-wrap md:flex-nowrap gap-6">
-        {/* Main Content with Tabs */}
-        <main className="flex-1 border-r-2 border-gray-300">
-          <div className="px-4 py-6 space-y-6">
-            <MainTabs articles={articles} categories={categories} />
-          </div>
+      <div className="flex flex-col lg:flex-row max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 gap-6">
+        <main className="flex-1">
+          <MainTabs articles={articles} categories={categories} />
         </main>
-
-        {/* Sidebar Container */}
-        <div className="w-full md:w-1/4 relative">
-          <div className="sticky top-6 py-6">
-            <Sidebar />
-          </div>
-        </div>
+        <aside className="hidden lg:block w-full lg:w-1/4 lg:max-w-[300px]">
+          <Sidebar />
+        </aside>
       </div>
     </div>
   );
