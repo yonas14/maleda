@@ -14,11 +14,11 @@ type ArticleProps = {
 
 export default function ArticleCard({ title, description, date, views, comments, image, category }: ArticleProps) {
   return (
-    <Card className="flex gap-4">
-      <CardContent className="p-4 flex-1">
+    <Card className="h-full flex flex-col rounded-xl hover:shadow-lg transition-all">
+      <CardContent className="p-4 flex-1 flex flex-col">
         <h2 className="text-xl font-bold mt-1">{title}</h2>
-        <p className="text-gray-600 mt-2">{description}</p>
-        <div className="text-sm text-gray-500 mt-2 flex items-center space-x-4">
+        <p className="text-gray-600 mt-2 flex-1">{description}</p>
+        <div className="text-sm text-gray-500 mt-4 flex items-center space-x-4">
           <span>{date}</span>
           <span className="flex items-center gap-1">
             <Eye className="h-4 w-4" /> {views}
