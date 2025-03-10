@@ -32,11 +32,13 @@ export default async function Home() {
     <div className="min-h-screen bg-gray-50">
       <Navbar />
       <div className="flex flex-col lg:flex-row max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 gap-6">
-        <main className="flex-1">
+        <main className="flex-1 lg:max-h-[calc(100vh-5rem)] lg:overflow-y-auto">
           <MainTabs articles={articles} categories={categories} />
         </main>
         <aside className="hidden lg:block w-full lg:w-1/4 lg:max-w-[300px]">
-          <Sidebar />
+          <div className="sticky top-6 lg:max-h-[calc(100vh-5rem)] lg:overflow-y-auto">
+            <Sidebar />
+          </div>
         </aside>
       </div>
     </div>

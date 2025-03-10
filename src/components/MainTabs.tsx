@@ -264,8 +264,8 @@ export default function MainTabs({ articles, categories }: MainTabsProps) {
     <Tabs defaultValue="all" className="w-full" onValueChange={handleTabChange}>
       <div 
         ref={tabsRef}
-        className={`sticky top-0 z-50 border-b border-gray-200 transition-all duration-200 ${
-          isSticky ? 'bg-white/95 backdrop-blur-sm shadow-md' : 'bg-transparent'
+        className={`sticky top-0 z-50 border-b border-gray-200 transition-all duration-300 ${
+          isSticky ? 'bg-white shadow-lg backdrop-blur-md' : 'bg-white/80 backdrop-blur-sm'
         }`}
       >
         <div className="relative w-full">
