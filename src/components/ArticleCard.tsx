@@ -13,6 +13,9 @@ type ArticleProps = {
 };
 
 export default function ArticleCard({ title, description, date, views, image, category }: ArticleProps) {
+  // Ensure the image path is absolute
+  const imagePath = image.startsWith('/') ? image : `/${image}`;
+  
   return (
     <Card className="h-full flex flex-row items-center rounded-xl hover:shadow-lg transition-all">
       <CardContent className="p-4 flex-1 flex flex-col">
@@ -33,12 +36,13 @@ export default function ArticleCard({ title, description, date, views, image, ca
       </CardContent>
       <div className="relative w-[200px] h-[200px] p-4">
         <Image 
-          src={image}
+          src={imagePath}
           alt={title} 
           width={200}
           height={200}
           className="object-cover rounded-lg"
           priority
+          unoptimized
         />
       </div>
     </Card>

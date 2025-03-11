@@ -1,14 +1,13 @@
-module.exports = {
+/** @type {import('next').NextConfig} */
+const nextConfig = {
   images: {
+    unoptimized: true,
     remotePatterns: [
       {
-        protocol: 'http',
-        hostname: 'localhost',
-        port: '',
-        pathname: '/**',
+        protocol: 'https',
+        hostname: '**',
       },
     ],
-    unoptimized: true,
   },
   async rewrites() {
     return [
@@ -19,3 +18,5 @@ module.exports = {
     ];
   },
 };
+
+module.exports = nextConfig;
