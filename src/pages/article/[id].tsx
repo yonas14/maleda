@@ -101,9 +101,6 @@ const ArticlePage = () => {
               <span className="mr-4 flex items-center gap-1">
                 <Eye className="h-4 w-4" /> {article.views} views
               </span>
-              <span className="flex items-center gap-1">
-                <MessageCircle className="h-4 w-4" /> {article.comments} comments
-              </span>
             </div>
             <div className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700">
               {article.category}

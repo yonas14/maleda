@@ -14,7 +14,7 @@ type ArticleProps = {
 
 export default function ArticleCard({ title, description, date, views, comments, image, category }: ArticleProps) {
   return (
-    <Card className="h-full flex flex-col rounded-xl hover:shadow-lg transition-all">
+    <Card className="h-full flex flex-row items-center rounded-xl hover:shadow-lg transition-all">
       <CardContent className="p-4 flex-1 flex flex-col">
         <h2 className="text-xl font-bold mt-1">{title}</h2>
         <p className="text-gray-600 mt-2 flex-1">{description}</p>
@@ -31,7 +31,16 @@ export default function ArticleCard({ title, description, date, views, comments,
           )}
         </div>
       </CardContent>
-      {/* <Image src={image} alt={title} width={120} height={80} className="rounded-md" /> */}
+      <div className="relative w-[200px] h-[200px] p-4">
+        <Image 
+          src={image.replace('/data', '')}
+          alt={title} 
+          width={200}
+          height={200}
+          className="object-cover rounded-lg"
+          priority
+        />
+      </div>
     </Card>
   );
 }
