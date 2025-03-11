@@ -33,7 +33,7 @@ export default function ArticleCard({ title, description, date, views, image, ca
       </CardContent>
       <div className="relative w-[200px] h-[200px] p-4">
         <Image 
-          src={image.replace('/data', '')}
+          src={image}
           alt={title} 
           width={200}
           height={200}

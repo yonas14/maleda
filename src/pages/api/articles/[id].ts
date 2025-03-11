@@ -1,30 +1,35 @@
-import { NextApiRequest, NextApiResponse } from 'next';
-import fs from 'fs/promises';
-import path from 'path';
+import articles from '../../../../data/articles.json';
+
 export const runtime = 'edge';
 
-type Article = {
-  title: string;
-  description: string;
-  date: string;
-  views: string;
-  comments: string;
-  image: string;
-  category: string;
-};
+export default function handler(request: Request) {
+  try {
+    const url = new URL(request.url);
+    const id = url.pathname.split('/').pop();
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  
-  const { id } = req.query;
-  const filePath = path.join(process.cwd(), 'data', 'articles.json');
-  const jsonData = await fs.readFile(filePath, 'utf8');
-  const articles: Article[] = JSON.parse(jsonData);
-  const article = articles[Number(id)];
+    const article = articles[Number(id)];
 
-  if (article) {
-    res.status(200).json(article);
-  } else {
-    res.status(404).json({ message: 'Article not found' });
+    if (article) {
+      return new Response(JSON.stringify(article), {
+        status: 200,
+        headers: {
+          'content-type': 'application/json',
+        },
+      });
+    } else {
+      return new Response(JSON.stringify({ message: 'Article not found' }), {
+        status: 404,
+        headers: {
+          'content-type': 'application/json',
+        },
+      });
+    }
+  } catch (error: unknown) {
+    return new Response(JSON.stringify({ message: 'Internal Server Error', error }), {
+      status: 500,
+      headers: {
+        'content-type': 'application/json',
+      },
+    });
   }
-  
 }
