@@ -1,6 +1,7 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import fs from 'fs/promises';
 import path from 'path';
+export const runtime = 'edge';
 
 type Article = {
   title: string;
@@ -13,19 +14,17 @@ type Article = {
 };
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  try {
-    const { id } = req.query;
-    const filePath = path.join(process.cwd(), 'data', 'articles.json');
-    const jsonData = await fs.readFile(filePath, 'utf8');
-    const articles: Article[] = JSON.parse(jsonData);
-    const article = articles[Number(id)];
+  
+  const { id } = req.query;
+  const filePath = path.join(process.cwd(), 'data', 'articles.json');
+  const jsonData = await fs.readFile(filePath, 'utf8');
+  const articles: Article[] = JSON.parse(jsonData);
+  const article = articles[Number(id)];
 
-    if (article) {
-      res.status(200).json(article);
-    } else {
-      res.status(404).json({ message: 'Article not found' });
-    }
-  } catch (error) {
-    res.status(500).json({ message: 'Internal Server Error', error: error.message });
+  if (article) {
+    res.status(200).json(article);
+  } else {
+    res.status(404).json({ message: 'Article not found' });
   }
+  
 }

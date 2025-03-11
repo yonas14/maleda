@@ -25,7 +25,7 @@ export type CardProps = {
   index: number;
 };
 
-const Card = forwardRef<CardRef, CardProps>(({ article, href, index }, ref) => {
+const Card = forwardRef<CardRef, CardProps>(({ article, href }, ref) => {
   const linkRef = useRef<HTMLAnchorElement>(null);
 
   useImperativeHandle(ref, () => ({

@@ -1,6 +1,6 @@
 import { Card, CardContent } from "@/components/ui/card";
 import Image from "next/image";
-import { Eye, MessageCircle, Calendar } from "lucide-react";
+import { Eye } from "lucide-react";
 
 type ArticleProps = {
   title: string;
@@ -12,7 +12,7 @@ type ArticleProps = {
   category?: string;
 };
 
-export default function ArticleCard({ title, description, date, views, comments, image, category }: ArticleProps) {
+export default function ArticleCard({ title, description, date, views, image, category }: ArticleProps) {
   return (
     <Card className="h-full flex flex-row items-center rounded-xl hover:shadow-lg transition-all">
       <CardContent className="p-4 flex-1 flex flex-col">

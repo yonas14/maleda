@@ -2,7 +2,7 @@ import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import Navbar from "@/components/Navbar";
 import "@/styles/globals.css";
-import { Eye, MessageCircle, Clock, Calendar, User } from "lucide-react";
+import { Eye, Clock, Calendar, User } from "lucide-react";
 
 type Article = {
   title: string;

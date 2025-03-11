@@ -2,7 +2,6 @@
 
 import { useRef, useEffect, useState, useCallback } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ChevronLeft, ChevronRight } from "lucide-react";
 import Card, { Article, CardRef } from "./Card";
 
 type MainTabsProps = {
@@ -15,16 +14,12 @@ export default function MainTabs({ articles, categories }: MainTabsProps) {
   const tabsRef = useRef<HTMLDivElement>(null);
   const loadMoreRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
-  const [showLeftArrow, setShowLeftArrow] = useState(false);
-  const [showRightArrow, setShowRightArrow] = useState(true);
   const [isSticky, setIsSticky] = useState(false);
-  const [scrollProgress, setScrollProgress] = useState(0);
   const [visibleArticles, setVisibleArticles] = useState<Article[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [activeTab, setActiveTab] = useState("all");
   const [isLoading, setIsLoading] = useState(false);
   const articlesPerPage = 5;
-  const [isScrolling, setIsScrolling] = useState(false);
   const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const cardRefs = useRef<Map<string, CardRef>>(new Map());
 
@@ -32,7 +27,6 @@ export default function MainTabs({ articles, categories }: MainTabsProps) {
   const TAB_HEIGHT = 80; // Height of the tab bar in pixels
   const FADE_OFFSET = 300; // Start fading earlier
   const SCROLL_DISTANCE = 150; // Shorter distance for more dramatic fade
-  const GRADIENT_HEIGHT = 200; // Height of the gradient effect
 
   // Calculate trending categories
   const trendingCategories = categories.map(category => {
@@ -107,16 +101,15 @@ export default function MainTabs({ articles, categories }: MainTabsProps) {
     };
   }, [currentPage, isLoading, activeTab]);
 
-  const handleScrollStart = useCallback((event?: Event) => {
-    setIsScrolling(true);
+  const handleScrollStart = useCallback(() => {
     // Clear any existing timeout
     if (scrollTimeoutRef.current) {
       clearTimeout(scrollTimeoutRef.current);
     }
     // Set a new timeout to detect when scrolling stops
     scrollTimeoutRef.current = setTimeout(() => {
-      setIsScrolling(false);
-    }, 150); // Adjust this value to control how quickly the fade disappears after scrolling stops
+      // Remove the setIsScrolling call since we're not using it
+    }, 150);
   }, []);
 
   useEffect(() => {
@@ -140,25 +133,16 @@ export default function MainTabs({ articles, categories }: MainTabsProps) {
       setIsSticky(isAtTop);
       handleScrollStart();
 
-      // Calculate scroll progress for the gradient effect
-      const scrollTop = window.scrollY;
-      const viewportHeight = window.innerHeight;
-      const contentRect = contentContainer.getBoundingClientRect();
-      
       // Calculate distances for top and bottom gradients
       const distanceFromTop = rect.top - TAB_HEIGHT;
-      const distanceFromBottom = viewportHeight - contentRect.bottom;
       
       // Calculate progress based on scroll position
-      let progress;
       if (distanceFromTop > FADE_OFFSET) {
-        progress = 0;
+        // Not in fade range
       } else {
         const effectiveScroll = FADE_OFFSET - distanceFromTop;
-        progress = Math.min(effectiveScroll / SCROLL_DISTANCE, 1);
+        Math.min(effectiveScroll / SCROLL_DISTANCE, 1);
       }
-      
-      setScrollProgress(progress);
     };
 
     scrollContainer.addEventListener('wheel', handleWheel, { passive: false });
@@ -176,17 +160,6 @@ export default function MainTabs({ articles, categories }: MainTabsProps) {
     };
   }, [handleScrollStart]);
 
-  const scroll = (direction: 'left' | 'right') => {
-    if (!scrollContainerRef.current) return;
-    
-    const scrollAmount = 300;
-    const newScrollLeft = scrollContainerRef.current.scrollLeft + (direction === 'left' ? -scrollAmount : scrollAmount);
-    scrollContainerRef.current.scrollTo({
-      left: newScrollLeft,
-      behavior: 'smooth'
-    });
-  };
-
   const setCardRef = useCallback((element: CardRef | null, id: string) => {
     if (element) {
       cardRefs.current.set(id, element);
@@ -200,7 +173,7 @@ export default function MainTabs({ articles, categories }: MainTabsProps) {
     
     const viewportHeight = window.innerHeight;
     
-    cardRefs.current.forEach((cardRef, id) => {
+    cardRefs.current.forEach((cardRef) => {
       const cardEl = cardRef.element;
       if (cardEl) {
         const rect = cardEl.getBoundingClientRect();

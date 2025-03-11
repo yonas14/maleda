@@ -7,6 +7,7 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import "@/styles/globals.css";
 import fs from "fs/promises";
 import path from "path";
+
 import { GetStaticProps, GetStaticPaths } from "next";
 import { useRef, useEffect, useState } from "react";
 
